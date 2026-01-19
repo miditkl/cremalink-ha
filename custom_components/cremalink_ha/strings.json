@@ -1,0 +1,30 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect with server",
+        "description": "Please enter the URL of your Cremalink Add-on.",
+        "data": {
+          "addon_url": "Add-on URL (e.g. http://localhost:10280)"
+        }
+      },
+      "device": {
+        "title": "Configure device",
+        "description": "Enter the credentials of your coffee machine.",
+        "data": {
+          "dsn": "Device Serial Number (DSN)",
+          "lan_key": "LAN Key",
+          "device_ip": "IP-Address of coffee machine",
+          "device_map": "Device Map"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to server. Is the URL correct and the server running?",
+      "unknown": "Unknown error occurred"
+    },
+    "abort": {
+      "already_configured": "Device is already configured."
+    }
+  }
+}

@@ -4,5 +4,6 @@ version = "0.1.0"
 description = "Cremalink for Home-Assistant Add-on & Integration"
 requires-python = ">=3.13"
 dependencies = [
-    "cremalink==0.1.0b9"
+    "homeassistant",
+    "cremalink==0.1.0b11"
 ]
