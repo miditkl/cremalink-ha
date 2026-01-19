@@ -1,5 +1,6 @@
 {
   "name": "Cremalink for Home-Assistant",
-  "content_in_root": true,
-  "homeassistant": "2025.12.05b0"
+  "homeassistant": "2025.12.05b0",
+
+  "persistent_directory": "data"
 }
