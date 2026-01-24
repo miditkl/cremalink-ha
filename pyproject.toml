@@ -1,0 +1,9 @@
+[project]
+name = "cremalink-ha"
+version = "0.1.0b1"
+description = "Cremalink for Home-Assistant Add-on & Integration"
+requires-python = ">=3.13"
+dependencies = [
+    "homeassistant",
+    "cremalink>=0.1.0b12, <1.0.0"
+]

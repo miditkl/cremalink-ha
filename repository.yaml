@@ -1,0 +1,5 @@
+name: Cremalink for Home-Assistant
+url: "https://github.com/miditkl/cremalink-ha"
+maintainer: "miditkl"
+source: "https://github.com/miditkl/cremalink-ha"
+homeassistant: "2025.12.05b0"
