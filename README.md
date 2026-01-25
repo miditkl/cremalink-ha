@@ -48,7 +48,7 @@ Before installing this integration, you must install and configure the **Cremali
 1.  Navigate to **Settings** > **Devices & Services**.
 2.  Click **Add Integration**.
 3.  Search for **Cremalink**.
-4.  Follow the configuration flow. You will need to provide the connection details for the Cremalink Server Add-on.
+4.  Follow the configuration flow. [You will need to provide the connection details for the Cremalink Server Add-on.](https://github.com/miditkl/cremalink-ha/discussions/5)
 
 ---
 
