@@ -1,8 +1,9 @@
 """Binary sensor platform for the Cremalink integration."""
 from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorDeviceClass
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.helpers.device_registry import DeviceInfo
 
-from .const import DOMAIN
+from .const import DOMAIN, GITHUB_URL
 
 BINARY_SENSORS = [
     ("is_busy", "Busy", None, BinarySensorDeviceClass.RUNNING),
@@ -24,17 +25,19 @@ async def async_setup_entry(hass, entry, async_add_entities):
     """
     data = hass.data[DOMAIN][entry.entry_id]
     coordinator = data["coordinator"]
+    device = data["device"]
 
-    entities = []
-    for key, name, icon, dev_class in BINARY_SENSORS:
-        entities.append(CremalinkBinarySensor(coordinator, entry, key, name, icon, dev_class))
+    entities = [
+        CremalinkBinarySensor(coordinator, device, entry, key, name, icon, device_class)
+        for key, name, icon, device_class in BINARY_SENSORS
+    ]
 
     async_add_entities(entities)
 
 
 class CremalinkBinarySensor(CoordinatorEntity, BinarySensorEntity):
     """Representation of a Cremalink binary sensor."""
-    def __init__(self, coordinator, entry, key, name, icon, dev_class):
+    def __init__(self, coordinator, device, entry, key, name, icon, dev_class):
         """Initialize the binary sensor.
 
         Args:
@@ -46,11 +49,27 @@ class CremalinkBinarySensor(CoordinatorEntity, BinarySensorEntity):
             dev_class: The device class of the sensor.
         """
         super().__init__(coordinator)
+        self.device = device
+        self.entry = entry
         self._key = key
         self._attr_name = f"{entry.title} {name}"
         self._attr_unique_id = f"{entry.entry_id}_{key}"
         self._attr_icon = icon
         self._attr_device_class = dev_class
+
+
+    @property
+    def device_info(self):
+        """Return device information so HA groups entities under the Hub device."""
+        return DeviceInfo(
+            identifiers={(DOMAIN, self.device.dsn)},  # Must match across all entities
+            name=self.entry.title,                    # Device (Hub) name
+            manufacturer="Cremalink",
+            model="Smart Coffee Machine",
+            sw_version=getattr(self.device, "firmware_version", None),
+            configuration_url= GITHUB_URL,
+        )
+
 
     @property
     def is_on(self):
