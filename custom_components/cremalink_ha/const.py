@@ -11,3 +11,5 @@ CONF_DEVICE_MAP = "device_map"
 
 DEFAULT_ADDON_URL = "http://localhost:10280"
 CUSTOM_MAP_DIR = "cremalink_custom_maps"
+
+GITHUB_URL = "https://github.com/miditkl/cremalink-ha"
