@@ -1,6 +1,7 @@
 """Sensor platform for the Cremalink integration."""
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import PERCENTAGE
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
@@ -50,6 +51,11 @@ class CremalinkSensor(CoordinatorEntity, SensorEntity):
         self._attr_unique_id = f"{entry.entry_id}_{key}"
         self._attr_icon = icon
         self._attr_native_unit_of_measurement = unit
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, entry.entry_id)},
+            name=entry.title,
+            manufacturer="cremalink",
+        )
 
     @property
     def native_value(self):
