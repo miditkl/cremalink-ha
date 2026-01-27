@@ -1,5 +1,6 @@
 """Switch platform for the Cremalink integration."""
 from homeassistant.components.switch import SwitchEntity
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 
@@ -34,6 +35,11 @@ class CremalinkPowerSwitch(CoordinatorEntity, SwitchEntity):
         self._attr_name = f"{entry.title} Power"
         self._attr_unique_id = f"{entry.entry_id}_power"
         self._attr_icon = "mdi:power"
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, entry.entry_id)},
+            name=entry.title,
+            manufacturer="cremalink",
+        )
 
     @property
     def is_on(self):
