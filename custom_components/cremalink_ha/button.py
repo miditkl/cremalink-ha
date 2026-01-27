@@ -1,9 +1,7 @@
 """Button platform for the Cremalink integration."""
 from homeassistant.components.button import ButtonEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from homeassistant.helpers.device_registry import DeviceInfo
-
-from .const import DOMAIN, GITHUB_URL
+from .const import DOMAIN
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -25,44 +23,29 @@ async def async_setup_entry(hass, entry, async_add_entities):
     for cmd in cmds:
         # Filter out power commands as they might be handled elsewhere
         if cmd.lower() not in ["wakeup", "standby", "refresh"]:
-            entities.append(CremalinkButton(coordinator, device, entry.title, cmd, entry.entry_id))
+            entities.append(CremalinkButton(coordinator, device, cmd, entry.entry_id))
     async_add_entities(entities)
 
 
 class CremalinkButton(CoordinatorEntity, ButtonEntity):
     """Representation of a Cremalink button."""
 
-    def __init__(self, coordinator, device, dev_name, cmd, entry_id):
+    def __init__(self, coordinator, device, cmd, entry_id):
         """Initialize the button.
 
         Args:
             coordinator: The data update coordinator.
             device: The Cremalink device instance.
-            dev_name: The name of the device.
             cmd: The command associated with this button.
             entry_id: The unique ID of the config entry.
         """
         super().__init__(coordinator)
         self.device = device
         self._cmd = cmd
-        self._dev_name = dev_name
         self._title = cmd.replace('_', ' ').title()
         self._attr_name = f"{"Brew" if self._title not in ["Stop"] else ""} {self._title} {"brewing" if self._title in ["Stop"] else ""}"
         self._attr_unique_id = f"{entry_id}_cmd_{cmd}"
         self._attr_icon = "mdi:coffee"
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Return device information so HA groups entities under the Hub device."""
-        return DeviceInfo(
-            identifiers={(DOMAIN, self.device.dsn)},  # must match across entities
-            name=self._dev_name,                      # device name (entry.title passed in)
-            manufacturer="Cremalink",
-            model="Smart Coffee Machine",
-            sw_version=getattr(self.device, "firmware_version", None),
-            configuration_url=GITHUB_URL,             # centralised GitHub link
-        )
-
 
     @property
     def available(self):

@@ -2,9 +2,8 @@
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import PERCENTAGE
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from homeassistant.helpers.device_registry import DeviceInfo
 
-from .const import DOMAIN, GITHUB_URL
+from .const import DOMAIN
 
 SENSORS = [
     ("status_name", "Status", "mdi:coffee-maker", None),
@@ -23,21 +22,18 @@ async def async_setup_entry(hass, entry, async_add_entities):
     """
     data = hass.data[DOMAIN][entry.entry_id]
     coordinator = data["coordinator"]
-    device = data["device"]
 
-    entities = [
-        CremalinkSensor(coordinator, device, entry, key, name, icon, unit)
-        for key, name, icon, unit in SENSORS
-    ]
+    entities = []
+    for key, name, icon, unit in SENSORS:
+        entities.append(CremalinkSensor(coordinator, entry, key, name, icon, unit))
+
     async_add_entities(entities)
 
 
 class CremalinkSensor(CoordinatorEntity, SensorEntity):
     """Representation of a Cremalink sensor."""
 
-    _attr_has_entity_name = True
-
-    def __init__(self, coordinator, device, entry, key, name, icon, unit):
+    def __init__(self, coordinator, entry, key, name, icon, unit):
         """Initialize the sensor.
 
         Args:
@@ -49,37 +45,13 @@ class CremalinkSensor(CoordinatorEntity, SensorEntity):
             unit: The unit of measurement for the sensor.
         """
         super().__init__(coordinator)
-        self.device = device
-        self.entry = entry
         self._key = key
-
-        # Short entity name; device name comes from device_info
-        self._attr_name = name
+        self._attr_name = f"{entry.title} {name}"
+        self._attr_unique_id = f"{entry.entry_id}_{key}"
         self._attr_icon = icon
-        self._attr_unique_id = f"{device.dsn}_{key}"
         self._attr_native_unit_of_measurement = unit
 
     @property
-    def device_info(self):
-        """Return device information so HA groups sensors under the Hub device."""
-        return DeviceInfo(
-            identifiers={(DOMAIN, self.device.dsn)},   # Must be identical across all entities
-            name=self.entry.title,                     # Device (Hub) name
-            manufacturer="Cremalink",
-            model="Smart Coffee Machine",
-            sw_version=getattr(self.device, "firmware_version", None),
-            # Leave the GitHub URL on the Device page:
-            configuration_url= GITHUB_URL,
-        )
-
-    @property
-    def available(self):
-        """Entity is available only when coordinator has data."""
-        return bool(self.coordinator.data)
-
-    @property
     def native_value(self):
-        """Return the current sensor value from coordinator data."""
-        data = self.coordinator.data
-        return getattr(data, self._key, None) if data else None
-
+        """Return the value of the sensor."""
+        return getattr(self.coordinator.data, self._key, None)

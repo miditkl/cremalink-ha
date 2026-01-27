@@ -1,9 +1,7 @@
 """Switch platform for the Cremalink integration."""
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from homeassistant.helpers.device_registry import DeviceInfo
-
-from .const import DOMAIN, GITHUB_URL
+from .const import DOMAIN
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -23,9 +21,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
 class CremalinkPowerSwitch(CoordinatorEntity, SwitchEntity):
     """Representation of a Cremalink power switch."""
 
-    _attr_icon = "mdi:power"
-    _attr_has_entity_name = True
-
     def __init__(self, coordinator, device, entry):
         """Initialize the switch.
 
@@ -36,25 +31,9 @@ class CremalinkPowerSwitch(CoordinatorEntity, SwitchEntity):
         """
         super().__init__(coordinator)
         self.device = device
-        self.entry = entry
-        self._attr_name = "Power"
-        self._attr_unique_id = f"{device.dsn}_power"
+        self._attr_name = f"{entry.title} Power"
+        self._attr_unique_id = f"{entry.entry_id}_power"
         self._attr_icon = "mdi:power"
-
-    #
-    # ---- DEVICE INFO (⭐ REQUIRED FOR DEVICE PAGE) ----
-    #
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Return device information for the Cremalink hub."""
-        return DeviceInfo(
-            identifiers={(DOMAIN, self.device.dsn)},
-            name=self.entry.title,
-            manufacturer="Cremalink",
-            model="Local Device",
-            sw_version=getattr(self.device, "firmware_version", None),
-            configuration_url= GITHUB_URL,
-        )
 
     @property
     def is_on(self):
