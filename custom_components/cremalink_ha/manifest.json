@@ -11,6 +11,6 @@
     "cremalink>=0.1.0b14,<1.0.0"
   ],
   "issue_tracker": "https://github.com/miditkl/cremalink-ha/issues",
-  "version": "0.1.0b1",
+  "version": "v0.1.0b5",
   "quality_scale": "bronze"
 }
