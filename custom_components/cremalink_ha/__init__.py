@@ -9,7 +9,7 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
-from cremalink import create_local_device, device_map
+from cremalink import create_local_device, device_map, Client
 
 from .const import *
 from .coordinator import CremalinkCoordinator
@@ -29,16 +29,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         Returns:
             True if the setup was successful, False otherwise.
     """
-    addon_url = entry.data[CONF_ADDON_URL]
-    dsn = entry.data[CONF_DSN]
-    lan_key = entry.data[CONF_LAN_KEY]
-    device_ip = entry.data[CONF_DEVICE_IP]
-    map_selection = entry.data[CONF_DEVICE_MAP]
+    connection_type = entry.data.get(CONF_CONNECTION_TYPE, CONNECTION_LOCAL)
 
-    # Parse the addon URL to get host and port
-    parsed_url = urlparse(addon_url)
-    server_host = parsed_url.hostname
-    server_port = parsed_url.port or 80
+    dsn = entry.data[CONF_DSN]
+
+    map_selection = entry.data[CONF_DEVICE_MAP]
 
     try:
         # Resolve the device map path
@@ -53,23 +48,48 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         return False
 
     try:
-        # Create the local device instance
-        device = await hass.async_add_executor_job(
-            partial(
-                create_local_device,
-                dsn=dsn,
-                server_host=server_host,
-                server_port=server_port,
-                device_ip=device_ip,
-                lan_key=lan_key,
-                device_map_path=str(map_path)
+        if connection_type == CONNECTION_LOCAL:
+            addon_url = entry.data[CONF_ADDON_URL]
+            lan_key = entry.data[CONF_LAN_KEY]
+            device_ip = entry.data[CONF_DEVICE_IP]
+
+            # Parse the addon URL to get host and port
+            parsed_url = urlparse(addon_url)
+            server_host = parsed_url.hostname
+            server_port = parsed_url.port or 80
+
+            # Create the local device instance
+            device = await hass.async_add_executor_job(
+                partial(
+                    create_local_device,
+                    dsn=dsn,
+                    server_host=server_host,
+                    server_port=server_port,
+                    device_ip=device_ip,
+                    lan_key=lan_key,
+                    device_map_path=str(map_path)
+                )
             )
-        )
+        elif connection_type == CONNECTION_CLOUD:
+            token_file = entry.data[CONF_TOKEN_FILE]
+
+            def _create_cloud_device():
+                client = Client(token_file)
+                return client.get_device(dsn, device_map_path=str(map_path))
+
+            device = await hass.async_add_executor_job(_create_cloud_device)
+
+            if device is None:
+                raise ConfigEntryNotReady(f"Could not find cloud device with DSN {dsn}")
+
+        else:
+            _LOGGER.error("Unknown connection type: %s", connection_type)
+            return False
         # Configure the device
         await hass.async_add_executor_job(device.configure)
 
     except Exception as e:
-        raise ConfigEntryNotReady(f"Could not connect to Cremalink server: {e}") from e
+        raise ConfigEntryNotReady(f"Could not connect to Cremalink device: {e}") from e
 
     coordinator = CremalinkCoordinator(hass, device)
     await coordinator.async_config_entry_first_refresh()
@@ -92,7 +112,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         entry: The config entry.
 
     Returns:
-        True if the unload was successful.
+        True if unload was successful.
     """
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         hass.data[DOMAIN].pop(entry.entry_id)

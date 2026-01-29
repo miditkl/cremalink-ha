@@ -2,16 +2,40 @@
   "config": {
     "step": {
       "user": {
+        "title": "Select Connection Method",
+        "description": "Choose how you want to connect to your Cremalink device.",
+        "menu_options": {
+          "local": "Local Network (Add-on)",
+          "cloud": "Cloud (Ayla Networks)"
+        }
+      },
+      "local": {
         "title": "Connect with server",
         "description": "Please enter the URL of your Cremalink Add-on.",
         "data": {
           "addon_url": "Add-on URL (e.g. http://localhost:10280)"
         }
       },
+      "cloud_auth": {
+        "title": "Cloud Authentication",
+        "description": "Enter your refresh token to authenticate with the cloud service.",
+        "data": {
+          "refresh_token": "Refresh Token"
+        }
+      },
+      "cloud_device": {
+        "title": "Select Device",
+        "description": "Select the device you wish to add.",
+        "data": {
+          "dsn": "Device",
+          "device_map": "Device Map"
+        }
+      },
       "device": {
         "title": "Configure device",
         "description": "Enter the credentials of your coffee machine.",
         "data": {
+          "device_name": "Name",
           "dsn": "Device Serial Number (DSN)",
           "lan_key": "LAN Key",
           "device_ip": "IP-Address of coffee machine",
@@ -21,6 +45,8 @@
     },
     "error": {
       "cannot_connect": "Could not connect to server. Is the URL correct and the server running?",
+      "auth_failed": "Authentication failed. Please check your refresh token.",
+      "no_devices": "No devices found on this account.",
       "unknown": "Unknown error occurred"
     },
     "abort": {

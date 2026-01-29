@@ -2,7 +2,7 @@
 from homeassistant.components.button import ButtonEntity
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from .const import DOMAIN
+from .const import DOMAIN, CONF_CONNECTION_TYPE, CONNECTION_CLOUD
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -47,6 +47,7 @@ class CremalinkButton(CoordinatorEntity, ButtonEntity):
         self._attr_name = f"{"Brew" if self._title not in ["Stop"] else ""} {self._title} {"brewing" if self._title in ["Stop"] else ""}"
         self._attr_unique_id = f"{entry.entry_id}_cmd_{cmd}"
         self._attr_icon = "mdi:coffee"
+        self._connection_type = entry.data.get(CONF_CONNECTION_TYPE)
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             name=entry.title,
@@ -55,7 +56,9 @@ class CremalinkButton(CoordinatorEntity, ButtonEntity):
 
     @property
     def available(self):
-        """Return if the entity is available."""
+        """Return True if entity is available."""
+        if self._connection_type == CONNECTION_CLOUD:  # TODO: WORKAROUND Monitor in cremalink is not working properly, when using Cloud Device.
+            return True
         if self._title in ["Stop"]:
             return super().available and self.coordinator.data.is_busy
         return super().available and not self.coordinator.data.is_busy

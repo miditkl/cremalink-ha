@@ -4,7 +4,7 @@ from homeassistant.const import PERCENTAGE
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, CONF_CONNECTION_TYPE, CONNECTION_CLOUD
 
 SENSORS = [
     ("status_name", "Status", "mdi:coffee-maker", None),
@@ -51,11 +51,21 @@ class CremalinkSensor(CoordinatorEntity, SensorEntity):
         self._attr_unique_id = f"{entry.entry_id}_{key}"
         self._attr_icon = icon
         self._attr_native_unit_of_measurement = unit
+        self._connection_type = entry.data.get(CONF_CONNECTION_TYPE)
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             name=entry.title,
             manufacturer="cremalink",
         )
+
+    @property
+    def available(self):
+        """Return True if entity is available."""
+        if self._connection_type == CONNECTION_CLOUD:  # TODO: WORKAROUND Monitor in cremalink is not working properly, when using Cloud Device. 
+            return True
+        if not self.coordinator.data:
+            return False
+        return super().available
 
     @property
     def native_value(self):
