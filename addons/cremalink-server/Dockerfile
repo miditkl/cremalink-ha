@@ -3,7 +3,7 @@ FROM ghcr.io/home-assistant/${BUILD_ARCH}-base-python:3.13-alpine3.23
 
 
 RUN python -m venv /opt/venv \
-     && /opt/venv/bin/pip install -U --no-cache-dir "cremalink>=0.1.0b12,<1.0.0"
+     && /opt/venv/bin/pip install -U --no-cache-dir "cremalink>=0.1.0b14,<1.0.0"
 
 WORKDIR /opt/cremalink
 

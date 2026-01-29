@@ -57,8 +57,6 @@ class CremalinkButton(CoordinatorEntity, ButtonEntity):
     @property
     def available(self):
         """Return True if entity is available."""
-        if self._connection_type == CONNECTION_CLOUD:  # TODO: WORKAROUND Monitor in cremalink is not working properly, when using Cloud Device.
-            return True
         if self._title in ["Stop"]:
             return super().available and self.coordinator.data.is_busy
         return super().available and not self.coordinator.data.is_busy

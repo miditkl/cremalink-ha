@@ -53,8 +53,6 @@ class CremalinkPowerSwitch(CoordinatorEntity, SwitchEntity):
     @property
     def available(self):
         """Return True if entity is available."""
-        if self._connection_type == CONNECTION_CLOUD:  # TODO: WORKAROUND Monitor in cremalink is not working properly, when using Cloud Device.
-            return True
         if not self.coordinator.data:
             return False
         return super().available
