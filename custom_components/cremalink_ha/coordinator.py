@@ -11,6 +11,8 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+SCAN_INTERVAL_FAST = timedelta(seconds=1)
+SCAN_INTERVAL_SLOW = timedelta(seconds=30)
 
 class CremalinkCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the Cremalink device."""
@@ -27,7 +29,7 @@ class CremalinkCoordinator(DataUpdateCoordinator):
             _LOGGER,
             name=DOMAIN,
             # Poll the device every second for updates
-            update_interval=timedelta(seconds=1),
+            update_interval=SCAN_INTERVAL_FAST,
         )
         self.device = device
 
@@ -41,6 +43,13 @@ class CremalinkCoordinator(DataUpdateCoordinator):
             UpdateFailed: If there is an error communicating with the device.
         """
         try:
-            return await self.hass.async_add_executor_job(self.device.get_monitor)
+            data = await self.hass.async_add_executor_job(self.device.get_monitor)
+
+            if data.parsed["status"] == 0: # if in standby, poll slowly
+                self.update_interval = SCAN_INTERVAL_SLOW
+            else:
+                self.update_interval = SCAN_INTERVAL_FAST
+
+            return data
         except Exception as err:
             raise UpdateFailed(f"Error communicating with device: {err}") from err
