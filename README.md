@@ -24,7 +24,7 @@ This integration connects your Home Assistant instance to the **Cremalink** ecos
 
 ## 🚀 Installation
 
-### 1. Install the Add-on (Required)
+### 1. Install the Add-on (Required only for local connection)
 
 Before installing this integration, you must install and configure the **Cremalink Server Add-on**. This add-on acts as the bridge between your coffee machine and Home Assistant.
 
