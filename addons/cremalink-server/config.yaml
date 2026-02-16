@@ -1,6 +1,6 @@
 name: "Cremalink for Home-Assistant"
 description: "Runs the Cremalink local server from the PyPI cremalink package."
-version: "v0.1.0b5"
+version: "v0.1.0b7"
 url: "https://github.com/miditkl/cremalink-ha"
 slug: "cremalink_server"
 init: false
