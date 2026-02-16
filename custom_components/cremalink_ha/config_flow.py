@@ -7,7 +7,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 
-from cremalink.devices import get_device_maps
+from cremalink.devices import get_device_maps, load_device_map
 from cremalink import Client
 
 from .const import *
@@ -40,6 +40,24 @@ def get_available_maps(hass: HomeAssistant) -> list[str]:
     return maps
 
 
+def get_map_data(hass: HomeAssistant, map_name: str) -> dict:
+    """Retrieve data for a specific map."""
+    if map_name.startswith("custom:"):
+        filename = map_name.replace("custom:", "", 1)
+        custom_dir = hass.config.path(CUSTOM_MAP_DIR)
+        filepath = os.path.join(custom_dir, filename)
+        try:
+            with open(filepath, 'r') as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    else:
+        try:
+            return load_device_map(map_name)
+        except Exception:
+            return {}
+
+
 class CremalinkConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Cremalink."""
 
@@ -47,23 +65,53 @@ class CremalinkConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     _addon_url = DEFAULT_ADDON_URL
     _temp_token_file: str | None = None
     _discovered_devices: list[str] = []
+    _selected_map: str | None = None
 
     async def async_step_user(self, user_input=None):
-        """Handle the initial step.
+        """Handle the initial step (Model Selection)."""
+        errors = {}
+        if user_input is not None:
+            self._selected_map = user_input[CONF_DEVICE_MAP]
 
-        Args:
-            user_input: Input data from the user.
+            # Check support
+            map_data = await self.hass.async_add_executor_job(
+                get_map_data, self.hass, self._selected_map
+            )
+            support = map_data.get("support", {})
+            local_support = support.get("local", False)
+            cloud_support = support.get("cloud", False)
 
-        Returns:
-            The next step in the flow.
-        """
-        return self.async_show_menu(
+            if local_support and cloud_support:
+                return self.async_show_menu(
+                    step_id="choose_connection",
+                    menu_options={
+                        "local": "Local Network (Add-on) [recommended]",
+                        "cloud_auth": "Cloud (Ayla Networks)",
+                    }
+                )
+            elif local_support:
+                return await self.async_step_local()
+            elif cloud_support:
+                return await self.async_step_cloud_auth()
+            else:
+                errors["base"] = "no_support"
+
+        maps = await self.hass.async_add_executor_job(get_available_maps, self.hass)
+        return self.async_show_form(
             step_id="user",
-            menu_options={
-                "local": "Local Network (Add-on) [recommended]",
-                "cloud_auth": "Cloud (Ayla Networks)",
-            }
+            data_schema=vol.Schema({
+                vol.Required(CONF_DEVICE_MAP): vol.In(maps)
+            }),
+            errors=errors
         )
+
+    async def async_step_choose_connection(self, user_input=None):
+        """Handle the connection choice step."""
+        if user_input == "local":
+            return await self.async_step_local()
+        elif user_input == "cloud_auth":
+            return await self.async_step_cloud_auth()
+        return self.async_abort(reason="unknown_choice")
 
     async def async_step_local(self, user_input=None):
         """Handle the local connection step.
@@ -108,24 +156,31 @@ class CremalinkConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """
         errors = {}
         maps = await self.hass.async_add_executor_job(get_available_maps, self.hass)
+        
         if user_input:
             user_input[CONF_ADDON_URL] = self._addon_url
             user_input[CONF_CONNECTION_TYPE] = CONNECTION_LOCAL
+
+            if self._selected_map and CONF_DEVICE_MAP not in user_input:
+                user_input[CONF_DEVICE_MAP] = self._selected_map
 
             await self.async_set_unique_id(user_input[CONF_DSN])
             self._abort_if_unique_id_configured()
 
             return self.async_create_entry(title=f"{user_input[DEVICE_NAME]}", data=user_input)
 
+        schema = {
+            vol.Required(DEVICE_NAME): str,
+            vol.Required(CONF_DSN): str,
+            vol.Required(CONF_LAN_KEY): str,
+            vol.Required(CONF_DEVICE_IP): str,
+        }
+        if not self._selected_map:
+            schema[vol.Required(CONF_DEVICE_MAP)] = vol.In(maps) if maps else str
+
         return self.async_show_form(
             step_id="device",
-            data_schema=vol.Schema({
-                vol.Required(DEVICE_NAME): str,
-                vol.Required(CONF_DSN): str,
-                vol.Required(CONF_LAN_KEY): str,
-                vol.Required(CONF_DEVICE_IP): str,
-                vol.Required(CONF_DEVICE_MAP): vol.In(maps) if maps else str,
-            }),
+            data_schema=vol.Schema(schema),
             errors=errors,
         )
 
@@ -206,6 +261,9 @@ class CremalinkConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if self._temp_token_file and os.path.exists(self._temp_token_file):
                 os.rename(self._temp_token_file, final_token_path)
 
+            if self._selected_map and CONF_DEVICE_MAP not in user_input:
+                user_input[CONF_DEVICE_MAP] = self._selected_map
+
             data = {
                 CONF_CONNECTION_TYPE: CONNECTION_CLOUD,
                 DEVICE_NAME: dsn,  # Default name, user can change later in HA entity settings
@@ -216,12 +274,15 @@ class CremalinkConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             return self.async_create_entry(title=dsn, data=data)
 
+        schema = {
+            vol.Required(DEVICE_NAME): str,
+            vol.Required(CONF_DSN): vol.In(self._discovered_devices),
+        }
+        if not self._selected_map:
+            schema[vol.Required(CONF_DEVICE_MAP)] = vol.In(maps) if maps else str
+
         return self.async_show_form(
             step_id="cloud_device",
-            data_schema=vol.Schema({
-                vol.Required(DEVICE_NAME): str,
-                vol.Required(CONF_DSN): vol.In(self._discovered_devices),
-                vol.Required(CONF_DEVICE_MAP): vol.In(maps) if maps else str,
-            }),
+            data_schema=vol.Schema(schema),
             errors=errors,
         )
