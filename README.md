@@ -58,6 +58,10 @@ Contributions are welcome! If you have a machine profile not yet supported, plea
 
 ---
 
+## 💫 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=miditkl/cremalink-ha&type=date&logscale&legend=top-left)](https://www.star-history.com/#miditkl/cremalink-ha&type=date&logscale&legend=top-left)
+
 ## 📄 License
 
 Distributed under the **AGPL-3.0-or-later** License. See `LICENSE` for more information.
