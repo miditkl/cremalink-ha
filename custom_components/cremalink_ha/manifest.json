@@ -8,9 +8,9 @@
   "iot_class": "local_polling",
   "config_flow": true,
   "requirements": [
-    "cremalink==0.1.0b24"
+    "cremalink==0.1.0b25"
   ],
   "issue_tracker": "https://github.com/miditkl/cremalink-ha/issues",
-  "version": "v0.1.0b14",
+  "version": "v0.1.0b15",
   "quality_scale": "bronze"
 }
