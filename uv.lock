@@ -716,7 +716,7 @@ wheels = [
 
 [[package]]
 name = "cremalink"
-version = "0.1.0b26"
+version = "0.1.0b27"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fastapi" },
@@ -728,9 +728,9 @@ dependencies = [
     { name = "starlette" },
     { name = "uvicorn" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/60/5b/8d6a2e5495e0f9ba21b50352c05a88f99fc53f377bd3fa9bb7146f9c4a4d/cremalink-0.1.0b26.tar.gz", hash = "sha256:38ceed26ec261d402c1ad77942a749bda4ef630260177cbe69ddc04421bbcb20", size = 500543, upload-time = "2026-05-07T12:42:14.699Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c4/30/b716043ee1c8723e95dd765ebbc49f14789eb611221166025d892dffb622/cremalink-0.1.0b27.tar.gz", hash = "sha256:0a7af321ff708c2e05dfbb0cc121256a3ee804c6aa6b7245383c9980cd228b30", size = 503679, upload-time = "2026-05-11T13:18:58.226Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0f/65/2da2c0fa78e4744addd3dd2d2e78c27e7a45a38cdcee937ee327371f1e2d/cremalink-0.1.0b26-py3-none-any.whl", hash = "sha256:0e8aecc56db6eed2c9fd43a69e95464bf7e9cd4276b067cff6a534897a678c0f", size = 70824, upload-time = "2026-05-07T12:42:13.283Z" },
+    { url = "https://files.pythonhosted.org/packages/45/4a/89953debe1d74b65eeb2a5a6e207b5cf144b63e790568a03df06ea8252e0/cremalink-0.1.0b27-py3-none-any.whl", hash = "sha256:13b165e77510286aa8057bd815f2923291eafa2a9e86ef51e9f9d291d42806b6", size = 74496, upload-time = "2026-05-11T13:18:56.416Z" },
 ]
 
 [[package]]
@@ -744,7 +744,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "cremalink", specifier = "==0.1.0b26" },
+    { name = "cremalink", specifier = "==0.1.0b27" },
     { name = "homeassistant", specifier = ">=2026.2.3" },
 ]
 
