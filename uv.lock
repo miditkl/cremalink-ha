@@ -716,7 +716,7 @@ wheels = [
 
 [[package]]
 name = "cremalink"
-version = "0.1.0b26"
+version = "0.1.0b27"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fastapi" },
@@ -735,7 +735,7 @@ wheels = [
 
 [[package]]
 name = "cremalink-ha"
-version = "0.1.0b26"
+version = "0.1.0b27"
 source = { virtual = "." }
 dependencies = [
     { name = "cremalink" },
