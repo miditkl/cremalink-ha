@@ -13,6 +13,13 @@ CONF_CONNECTION_TYPE = "connection_type"
 CONF_REFRESH_TOKEN = "refresh_token"
 CONF_TOKEN_FILE = "token_file"
 
+# Cloud-assisted onboarding (cloud login replaces manual device-map/DSN entry)
+CONF_EMAIL = "email"
+CONF_PASSWORD = "password"
+CONF_REGION = "region"
+CONF_MANUAL_SETUP = "manual_setup"
+DEFAULT_REGION = "EU"  # only region with valid app credentials for v1 — see research.md #1
+
 CONNECTION_LOCAL = "local"
 CONNECTION_CLOUD = "cloud"
 

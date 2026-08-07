@@ -2,6 +2,29 @@
   "config": {
     "step": {
       "user": {
+        "title": "Sign in to your Cremalink cloud account",
+        "description": "Enter your cloud account email and password to automatically discover and set up your coffee machine. Check \"Advanced setup\" to configure a device manually instead.",
+        "data": {
+          "email": "Email",
+          "password": "Password",
+          "manual_setup": "Advanced setup (configure manually instead)"
+        }
+      },
+      "device_select": {
+        "title": "Select Device",
+        "description": "Your cloud account has more than one coffee machine. Choose which one to add.",
+        "data": {
+          "dsn": "Device"
+        }
+      },
+      "manual_map": {
+        "title": "Select Device Model",
+        "description": "We could not automatically identify the model for {device_name} ({dsn}). Please select it manually.",
+        "data": {
+          "device_map": "Device Model"
+        }
+      },
+      "manual": {
         "title": "Select Connection Method",
         "description": "Choose how you want to connect to your Cremalink device.",
         "menu_options": {
@@ -45,8 +68,10 @@
     },
     "error": {
       "cannot_connect": "Could not connect to server. Is the URL correct and the server running?",
-      "auth_failed": "Authentication failed. Please check your refresh token.",
+      "auth_failed": "Authentication failed. Please check your credentials.",
+      "missing_credentials": "Please enter both email and password, or check Advanced setup.",
       "no_devices": "No devices found on this account.",
+      "no_coffee_machine": "This account has devices, but none of them are recognized as a coffee machine.",
       "unknown": "Unknown error occurred"
     },
     "abort": {

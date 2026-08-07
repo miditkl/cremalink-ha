@@ -48,7 +48,14 @@ Before installing this integration, you must install and configure the **Cremali
 1.  Navigate to **Settings** > **Devices & Services**.
 2.  Click **Add Integration**.
 3.  Search for **Cremalink**.
-4.  Follow the configuration flow. [You will need to provide the connection details for the Cremalink Server Add-on.](https://github.com/miditkl/cremalink-ha/discussions/5)
+4.  Sign in with your Cremalink cloud account email and password. The integration
+    automatically discovers your coffee machine(s), detects the correct model, and
+    connects locally (via the add-on) whenever LAN details are available, falling
+    back to the cloud connection otherwise — no device map, DSN, or LAN key to type in.
+5.  Don't have (or don't want to use) a cloud account? Check **Advanced setup** on
+    the first screen to fall back to the previous manual flow: picking a device map
+    and entering the DSN/LAN key/IP (local) or a refresh token (cloud) by hand.
+    [More on the local add-on setup here.](https://github.com/miditkl/cremalink-ha/discussions/5)
 
 ---
 
