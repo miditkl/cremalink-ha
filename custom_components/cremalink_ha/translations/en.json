@@ -1,0 +1,174 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Select Connection Method",
+        "description": "Choose how you want to connect to your Cremalink device.",
+        "menu_options": {
+          "local": "Local Network (Add-on)",
+          "cloud": "Cloud (Ayla Networks)"
+        }
+      },
+      "local": {
+        "title": "Connect with server",
+        "description": "Please enter the URL of your Cremalink Add-on.",
+        "data": {
+          "addon_url": "Add-on URL (e.g. http://localhost:10280)"
+        }
+      },
+      "cloud_auth": {
+        "title": "Cloud Authentication",
+        "description": "Enter your refresh token to authenticate with the cloud service.",
+        "data": {
+          "refresh_token": "Refresh Token"
+        }
+      },
+      "cloud_device": {
+        "title": "Select Device",
+        "description": "Select the device you wish to add.",
+        "data": {
+          "dsn": "Device",
+          "device_map": "Device Map"
+        }
+      },
+      "device": {
+        "title": "Configure device",
+        "description": "Enter the credentials of your coffee machine.",
+        "data": {
+          "device_name": "Name",
+          "dsn": "Device Serial Number (DSN)",
+          "lan_key": "LAN Key",
+          "device_ip": "IP-Address of coffee machine",
+          "device_map": "Device Map"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to server. Is the URL correct and the server running?",
+      "auth_failed": "Authentication failed. Please check your refresh token.",
+      "no_devices": "No devices found on this account.",
+      "unknown": "Unknown error occurred"
+    },
+    "abort": {
+      "already_configured": "Device is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "status_name": {
+        "name": "Status",
+        "state": {
+          "in_standby": "Standby",
+          "waking_up": "Waking up",
+          "preparing_milk": "Preparing milk",
+          "dispensing_hot_water": "Dispensing hot water",
+          "cleaning_milk": "Cleaning milk system",
+          "preparing_chocolate": "Preparing chocolate",
+          "preparing_milk_alt": "Preparing milk",
+          "going_to_sleep": "Going to standby",
+          "unknown_29": "Unknown status 29",
+          "descaling": "Descaling",
+          "preparing_steam": "Preparing steam",
+          "ready": "Ready",
+          "rinsing": "Rinsing"
+        }
+      },
+      "progress_percent": {
+        "name": "Progress"
+      },
+      "accessory_name": {
+        "name": "Accessory",
+        "state": {
+          "none": "No accessory",
+          "hot_water_spout": "Hot water spout",
+          "latte_crema_hot": "LatteCrema Hot",
+          "chocolate": "Chocolate accessory",
+          "latte_crema_hot_clean": "LatteCrema Hot – Clean",
+          "latte_crema_cool": "LatteCrema Cool",
+          "latte_crema_cool_clean": "LatteCrema Cool – Clean"
+        }
+      }
+    },
+    "button": {
+      "brew_americano": {
+        "name": "Americano"
+      },
+      "brew_caffe_latte": {
+        "name": "Caffelatte"
+      },
+      "brew_cappuccino": {
+        "name": "Cappuccino"
+      },
+      "brew_cappuccino_mix": {
+        "name": "Cappuccino Mix"
+      },
+      "brew_cappuccino_plus": {
+        "name": "Cappuccino+"
+      },
+      "brew_coffee": {
+        "name": "Coffee"
+      },
+      "brew_cortado": {
+        "name": "Cortado"
+      },
+      "brew_doppio_plus": {
+        "name": "Doppio+"
+      },
+      "brew_double_espresso": {
+        "name": "2x Espresso"
+      },
+      "brew_espresso": {
+        "name": "Espresso"
+      },
+      "brew_espresso_macchiato": {
+        "name": "Espresso Macchiato"
+      },
+      "brew_espresso_soul": {
+        "name": "Espresso SOUL"
+      },
+      "brew_flat_white": {
+        "name": "Flat White"
+      },
+      "brew_hot_milk": {
+        "name": "Hot milk"
+      },
+      "brew_hot_water": {
+        "name": "Hot water"
+      },
+      "brew_latte_macchiato": {
+        "name": "Latte Macchiato"
+      },
+      "brew_long_coffee": {
+        "name": "Long"
+      },
+      "stop_brewing": {
+        "name": "Stop brewing"
+      }
+    },
+    "binary_sensor": {
+      "is_busy": {
+        "name": "Operation active"
+      },
+      "is_idle": {
+        "name": "Idle"
+      },
+      "is_watertank_open": {
+        "name": "Water tank"
+      },
+      "is_watertank_empty": {
+        "name": "Water tank empty"
+      },
+      "is_waste_container_full": {
+        "name": "Grounds container full"
+      },
+      "is_waste_container_missing": {
+        "name": "Grounds container missing"
+      }
+    },
+    "switch": {
+      "power": {
+        "name": "Power"
+      }
+    }
+  }
+}

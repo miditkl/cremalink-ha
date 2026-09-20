@@ -5,6 +5,28 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN, CONF_CONNECTION_TYPE, CONNECTION_CLOUD
 
 
+COMMAND_TRANSLATION_KEYS = {
+    "americano": "brew_americano",
+    "caffe_latte": "brew_caffe_latte",
+    "cappuccino": "brew_cappuccino",
+    "cappuccino_mix": "brew_cappuccino_mix",
+    "cappuccino_plus": "brew_cappuccino_plus",
+    "coffee": "brew_coffee",
+    "cortado": "brew_cortado",
+    "doppio_plus": "brew_doppio_plus",
+    "double_espresso": "brew_double_espresso",
+    "espresso": "brew_espresso",
+    "espresso_macchiato": "brew_espresso_macchiato",
+    "espresso_soul": "brew_espresso_soul",
+    "flat_white": "brew_flat_white",
+    "hot_milk": "brew_hot_milk",
+    "hot_water": "brew_hot_water",
+    "latte_macchiato": "brew_latte_macchiato",
+    "long_coffee": "brew_long_coffee",
+    "stop": "stop_brewing",
+}
+
+
 async def async_setup_entry(hass, entry, async_add_entities):
     """Set up the button platform.
 
@@ -43,8 +65,17 @@ class CremalinkButton(CoordinatorEntity, ButtonEntity):
         super().__init__(coordinator)
         self.device = device
         self._cmd = cmd
-        self._title = cmd.replace('_', ' ').title()
-        self._attr_name = f"{"Brew" if self._title not in ["Stop"] else ""} {self._title} {"brewing" if self._title in ["Stop"] else ""}"
+        self._title = cmd.replace("_", " ").title()
+
+        translation_key = COMMAND_TRANSLATION_KEYS.get(cmd)
+
+        if translation_key is not None:
+            self._attr_has_entity_name = True
+            self._attr_translation_key = translation_key
+        else:
+            # Keep commands from newer device maps visible before a
+            # dedicated translation has been added.
+            self._attr_name = f"Brew {self._title}"
         self._attr_unique_id = f"{entry.entry_id}_cmd_{cmd}"
         self._attr_icon = "mdi:coffee"
         self._connection_type = entry.data.get(CONF_CONNECTION_TYPE)
@@ -57,7 +88,7 @@ class CremalinkButton(CoordinatorEntity, ButtonEntity):
     @property
     def available(self):
         """Return True if entity is available."""
-        if self._title in ["Stop"]:
+        if self._cmd == "stop":
             return super().available and self.coordinator.data.is_busy
         return super().available and not self.coordinator.data.is_busy
 
