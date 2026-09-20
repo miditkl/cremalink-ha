@@ -13,8 +13,15 @@ from cremalink import create_local_device, device_map, Client
 
 from .const import *
 from .coordinator import CremalinkCoordinator
+from .statistics_coordinator import CremalinkStatisticsCoordinator
 
 _LOGGER = logging.getLogger(__name__)
+
+
+
+def supports_ecam610_statistics(map_selection: str) -> bool:
+    """Return whether verified ECAM610 A2 semantics apply."""
+    return str(map_selection).upper().removesuffix(".JSON") == "ECAM610"
 
 PLATFORMS = [Platform.SWITCH, Platform.BUTTON, Platform.SENSOR, Platform.BINARY_SENSOR]
 
@@ -30,6 +37,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             True if the setup was successful, False otherwise.
     """
     connection_type = entry.data.get(CONF_CONNECTION_TYPE, CONNECTION_LOCAL)
+
+    statistics_token_file = None
 
     dsn = entry.data[CONF_DSN]
 
@@ -72,6 +81,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             )
         elif connection_type == CONNECTION_CLOUD:
             token_file = entry.data[CONF_TOKEN_FILE]
+            statistics_token_file = token_file
 
             def _create_cloud_device():
                 client = Client(token_file)
@@ -94,10 +104,40 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     coordinator = CremalinkCoordinator(hass, device)
     await coordinator.async_config_entry_first_refresh()
 
+    statistics_coordinator = None
+
+    # b28 predates the merged core A2 implementation (#225). Keep the HA
+    # feature harmless on older core versions while this PR is stacked and
+    # waiting for the first upstream release that contains #225.
+    core_statistics_supported = hasattr(
+        Client,
+        "get_ecam610_statistics",
+    )
+
+    if (
+        statistics_token_file
+        and supports_ecam610_statistics(map_selection)
+        and core_statistics_supported
+    ):
+        statistics_coordinator = CremalinkStatisticsCoordinator(
+            hass,
+            dsn=dsn,
+            token_file=statistics_token_file,
+        )
+
+        # A complete A2 scan is slow and must not delay normal integration
+        # startup or the fast monitor coordinator.
+        entry.async_create_background_task(
+            hass,
+            statistics_coordinator.async_refresh(),
+            f"{DOMAIN} initial statistics refresh",
+        )
+
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = {
         "coordinator": coordinator,
-        "device": device
+        "statistics_coordinator": statistics_coordinator,
+        "device": device,
     }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
