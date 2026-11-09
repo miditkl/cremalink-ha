@@ -1,5 +1,5 @@
 {
-  "name": "Cremalink for Home-Assistant",
+  "name": "De'longhi Coffee Machine - Cremalink for Home-Assistant",
   "homeassistant": "2026.1.0",
   "persistent_directory": "data"
 }
