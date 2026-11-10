@@ -26,8 +26,19 @@ async def async_setup_entry(hass, entry, async_add_entities):
     data = hass.data[DOMAIN][entry.entry_id]
     coordinator = data["coordinator"]
 
+    # Only expose what the device map actually describes: a flag the profile does
+    # not define would otherwise show up as a permanently unknown entity.
+    described = None
+    if coordinator.data is not None:
+        try:
+            described = set(coordinator.data.available_fields)
+        except Exception:  # pragma: no cover - older library or cloud payload
+            described = None
+
     entities = []
     for key, name, icon, dev_class in BINARY_SENSORS:
+        if described is not None and key not in described:
+            continue
         entities.append(CremalinkBinarySensor(coordinator, entry, key, name, icon, dev_class))
 
     async_add_entities(entities)
