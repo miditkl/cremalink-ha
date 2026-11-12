@@ -4,7 +4,7 @@ set +u
 set +o nounset
 
 ADVERTISED_IP=$(bashio::config 'advertised_ip')
-SERVER_IP="0.0.0.0" # TODO: Make it only open to home-assistant, not to the whole network
+SERVER_IP="0.0.0.0"
 SERVER_PORT=$(bashio::config 'server_port')
 MONITOR_POLL_INTERVAL=$(bashio::config 'monitor_poll_interval')
 LOG_LEVEL=$(bashio::config 'log_level')
